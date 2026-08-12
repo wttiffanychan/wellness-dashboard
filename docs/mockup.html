@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#16130F" />
+<title>Wellness Dashboard — Today (Visual Direction Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Wellness Dashboard — Visual direction mockup
+   Static preview of the Today (home) view, per SPEC.md §5.1 + §6.
+   Dark theme. No build step, no JS. Tokens are verbatim from SPEC §6.1.
+   ============================================================ */
+
+:root{
+  /* --- Dark surface palette (SPEC §6.1) --- */
+  --canvas:       #16130F;
+  --surface:      #1F1B16;
+  --surface-sunk: #14110D;
+  --hairline:     #322C25;
+  --ink:          #F2EBE2;
+  --ink-soft:     #B5AAA0;
+  --ink-mute:     #837A71;
+  --accent:       #E5A47C;
+  --accent-soft:  #3A2C21;
+  --success:      #93AE88;
+
+  /* --- Metric colours, dark values (SPEC §6.1) --- */
+  --m-mind:  #B0A5D6;   /* meditation — lavender */
+  --m-sleep: #8A9FCC;   /* sleep — indigo    */
+  --m-move:  #E5A47C;   /* workout — apricot */
+  --m-walk:  #93AE88;   /* walking — sage    */
+  --m-fuel:  #DCB863;   /* protein — amber   */
+  --m-water: #87B8C9;   /* water — sky       */
+  --m-supp:  #D6959B;   /* supplements — rose*/
+  --m-read:  #84B8AB;   /* reading — teal    */
+  --m-chess: #B394BC;   /* chess — plum      */
+
+  /* --- Type (SPEC §6.2) --- */
+  --serif: "Fraunces", "Instrument Serif", Georgia, serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* --- Radii (SPEC §6.3) --- */
+  --r-card: 20px;
+  --r-tile: 18px;
+  --r-input: 12px;
+  --r-pill: 999px;
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{ -webkit-text-size-adjust: 100%; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size:16px;
+  line-height:1.6;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding: 28px 16px 40px;
+  gap:18px;
+}
+
+/* Fractal-noise paper texture, 2.5% (SPEC §6.3) */
+body::after{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  z-index:90;
+  opacity:.025;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+}
+
+.eyebrow{
+  font-size:11px; line-height:1.4;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color: var(--ink-mute);
+  font-weight:500;
+}
+
+/* ============================================================
+   Time-of-day preview switcher (mockup-only chrome)
+   The real app derives this from the clock; here it is a toggle
+   so the ambient header, greeting, supplement emphasis and the
+   mood block can all be previewed in each state.
+   ============================================================ */
+.tod-inputs{ position:absolute; opacity:0; pointer-events:none; }
+
+.tod{
+  display:flex; align-items:center; gap:10px;
+  flex-wrap:wrap; justify-content:center;
+  max-width:430px;
+}
+.tod-label{ margin-right:2px; }
+.tod-pills{
+  display:flex; gap:4px;
+  background: var(--surface);
+  border:1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  padding:4px;
+}
+.tod-pills label{
+  font-size:12px; font-weight:500;
+  color: var(--ink-mute);
+  padding:6px 13px;
+  border-radius: var(--r-pill);
+  cursor:pointer;
+  transition: color .2s var(--ease), background .2s var(--ease);
+  user-select:none;
+}
+.tod-pills label:hover{ color: var(--ink-soft); }
+
+body:has(#tod-dawn:checked)  label[for="tod-dawn"],
+body:has(#tod-day:checked)   label[for="tod-day"],
+body:has(#tod-dusk:checked)  label[for="tod-dusk"],
+body:has(#tod-night:checked) label[for="tod-night"]{
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ============================================================
+   Phone frame — the app is designed at 390px first (SPEC §6.5)
+   ============================================================ */
+.phone{
+  width:100%;
+  max-width:430px;
+  height: min(940px, calc(100vh - 132px));
+  min-height:600px;
+  position:relative;
+  background: var(--canvas);
+  border:1px solid var(--hairline);
+  border-radius:34px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(242,235,226,.02) inset;
+}
+
+.scroll{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none;
+  position:relative;
+}
+.scroll::-webkit-scrollbar{ width:0; height:0; }
+
+.page{ padding: 0 20px 132px; } /* 20px gutters (SPEC §6.3), room for nav + FAB */
+
+section + section{ margin-top:32px; }  /* 32px between major sections */
+
+/* ============================================================
+   1 · Ambient header — gradient mesh that shifts with the hour
+   ============================================================ */
+.ambient{
+  position:relative;
+  height:196px;
+  margin-bottom:-52px;
+  padding:26px 20px 0;
+  transition: background 600ms var(--ease);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 100%);
+}
+.ambient::after{ /* soft inner bloom so the mesh feels lit, not printed */
+  content:"";
+  position:absolute; inset:0;
+  background: radial-gradient(120% 70% at 50% -10%, rgba(242,235,226,.07), transparent 70%);
+  pointer-events:none;
+}
+
+/* dawn peach/rose · 5–10 AM */
+body:has(#tod-dawn:checked) .ambient{
+  background:
+    radial-gradient(90% 80% at 12% -5%,  rgba(229,164,124,.46), transparent 62%),
+    radial-gradient(80% 75% at 88% 8%,   rgba(214,149,155,.38), transparent 64%),
+    radial-gradient(120% 90% at 50% 0%,  rgba(220,184,99,.14),  transparent 70%),
+    var(--canvas);
+}
+/* clear warm ivory-blue · 10 AM–4 PM */
+body:has(#tod-day:checked) .ambient{
+  background:
+    radial-gradient(90% 80% at 18% -8%, rgba(235,225,209,.26), transparent 62%),
+    radial-gradient(85% 75% at 86% 6%,  rgba(135,184,201,.30), transparent 64%),
+    radial-gradient(120% 90% at 50% 0%, rgba(229,164,124,.10), transparent 72%),
+    var(--canvas);
+}
+/* amber dusk · 4–8 PM */
+body:has(#tod-dusk:checked) .ambient{
+  background:
+    radial-gradient(95% 85% at 20% -6%, rgba(229,164,124,.50), transparent 62%),
+    radial-gradient(80% 70% at 90% 10%, rgba(196,127,134,.34), transparent 64%),
+    radial-gradient(120% 90% at 55% 0%, rgba(158,127,168,.20), transparent 74%),
+    var(--canvas);
+}
+/* deep violet-indigo · 8 PM–5 AM */
+body:has(#tod-night:checked) .ambient{
+  background:
+    radial-gradient(95% 85% at 16% -8%, rgba(138,159,204,.34), transparent 62%),
+    radial-gradient(85% 75% at 88% 4%,  rgba(179,148,188,.32), transparent 64%),
+    radial-gradient(130% 95% at 50% 0%, rgba(110,134,184,.16), transparent 74%),
+    var(--canvas);
+}
+
+.header-row{
+  position:relative; z-index:2;
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+}
+.greeting{
+  font-family: var(--serif);
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+  font-weight:400;
+  font-size:32px; line-height:1.2;
+  letter-spacing:-.015em;
+  margin:0;
+  color: var(--ink);
+}
+.datum{
+  margin-top:6px;
+  font-size:14px; line-height:1.5;
+  letter-spacing:.04em;
+  color: var(--ink-soft);
+}
+
+/* greeting swaps with the hour */
+.g{ display:none; }
+body:has(#tod-dawn:checked)  .g-morning,
+body:has(#tod-day:checked)   .g-afternoon,
+body:has(#tod-dusk:checked)  .g-evening,
+body:has(#tod-night:checked) .g-evening{ display:inline; }
+
+/* streak chip */
+.streak{
+  display:inline-flex; align-items:center; gap:6px;
+  flex-shrink:0;
+  margin-top:4px;
+  padding:7px 13px 7px 10px;
+  border-radius: var(--r-pill);
+  background: rgba(242,235,226,.07);
+  border:1px solid rgba(242,235,226,.09);
+  -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+  font-size:13px; font-weight:500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space:nowrap;
+}
+.streak svg{ filter: drop-shadow(0 0 6px rgba(229,164,124,.45)); }
+.streak b{ font-weight:600; }
+
+.gear{
+  margin-top:6px;
+  color: var(--ink-soft);
+  display:flex;
+}
+
+/* ============================================================
+   2 · Quote of the day
+   ============================================================ */
+.quote-card{
+  position:relative;
+  border-radius: var(--r-card);
+  padding:26px 24px 18px;
+  /* theme wash: security → warm sand */
+  background:
+    linear-gradient(155deg, rgba(220,184,99,.10), rgba(229,164,124,.05) 55%, rgba(31,27,22,0)),
+    var(--surface);
+  border:1px solid var(--hairline);
+  overflow:hidden;
+}
+.quote-card::before{
+  content:"";
+  position:absolute; top:-60px; right:-50px;
+  width:190px; height:190px; border-radius:50%;
+  background: radial-gradient(circle, rgba(229,164,124,.16), transparent 68%);
+  pointer-events:none;
+}
+.quote-theme{
+  position:relative;
+  display:inline-flex; align-items:center; gap:7px;
+  margin-bottom:14px;
+}
+.theme-dot{ width:7px; height:7px; border-radius:50%; background: var(--accent);
+  box-shadow:0 0 8px rgba(229,164,124,.6); }
+.quote-body{
+  position:relative;
+  font-family: var(--serif);
+  font-variation-settings:"SOFT" 40;
+  font-weight:400;
+  font-size:21px;
+  line-height:1.55;
+  letter-spacing:-.005em;
+  margin:0;
+  max-width:19em;      /* ≈34 characters per line */
+  color: var(--ink);
+}
+.quote-foot{
+  position:relative;
+  margin-top:16px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.attrib{
+  font-size:13px; line-height:1.45;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color: var(--ink-mute);
+  font-weight:500;
+}
+.ghost-btns{ display:flex; gap:4px; }
+.ghost{
+  width:36px; height:36px;
+  display:grid; place-items:center;
+  border-radius: var(--r-pill);
+  border:1px solid transparent;
+  background:transparent;
+  color: var(--ink-mute);
+  cursor:pointer;
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.ghost:hover{ background: rgba(242,235,226,.05); color: var(--ink-soft); }
+
+/* ============================================================
+   3 · Ring grid
+   ============================================================ */
+.grid-8{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:12px;
+}
+@media (min-width:520px){ .grid-8{ grid-template-columns: repeat(4, 1fr); } }
+
+.tile{
+  position:relative;
+  border-radius: var(--r-tile);
+  border:1px solid var(--hairline);
+  background: var(--surface);
+  padding:16px 12px 14px;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  min-height:132px;
+  cursor:pointer;
+  transition: transform 120ms var(--ease), border-color .2s var(--ease);
+}
+.tile:active{ transform: scale(.97); }
+/* closed tiles warm to a 6% tint of the metric colour */
+.tile.is-done{
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c) 8%, transparent), transparent 70%),
+    var(--surface);
+  border-color: color-mix(in srgb, var(--c) 22%, var(--hairline));
+}
+.tile-name{
+  margin-top:10px;
+  font-size:13px; font-weight:500; line-height:1.45;
+  color: var(--ink);
+}
+.tile-val{
+  font-size:12px; line-height:1.45;
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+}
+.tile.is-done .tile-val{ color: var(--ink-soft); }
+
+.ring-wrap{ position:relative; width:56px; height:56px; display:grid; place-items:center; }
+.ring{ position:absolute; inset:0; transform: rotate(-90deg); }
+.ring circle{ fill:none; stroke-linecap:round; }
+.ring .track{ stroke: var(--hairline); stroke-width:3; }
+.ring .fill{ stroke: var(--c); stroke-width:3.5; stroke-dasharray:153.94; }
+.tile.is-done .ring .fill{
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--c) 55%, transparent));
+}
+.ring-icon{
+  position:relative; z-index:1;
+  color: var(--c);
+  display:flex;
+}
+.tile:not(.is-done) .ring-icon{ color: var(--ink); opacity:.4; }
+
+/* progress bar */
+.progress-head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  margin: 18px 0 9px;
+}
+.progress-head .label{ font-size:14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.progress-head .label b{ color: var(--ink); font-weight:600; }
+.progress-head .hint{ font-size:12px; color: var(--ink-mute); }
+.progress-track{
+  height:4px; border-radius: var(--r-pill);
+  background: var(--surface-sunk);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%; width:62.5%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg,
+    var(--m-mind) 0%, var(--m-sleep) 26%, var(--m-move) 52%, var(--m-walk) 76%, var(--m-read) 100%);
+  box-shadow: 0 0 14px rgba(229,164,124,.28);
+}
+
+/* the two tracked-but-not-gating metrics */
+.aside-row{
+  display:flex; align-items:center; gap:10px;
+  margin-top:16px; flex-wrap:wrap;
+}
+.mini{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:8px 15px 8px 9px;
+  border-radius: var(--r-pill);
+  border:1px solid var(--hairline);
+  background: var(--surface);
+  cursor:pointer;
+}
+.mini-ring{ position:relative; width:28px; height:28px; display:grid; place-items:center; flex-shrink:0; }
+.mini-ring svg.r{ position:absolute; inset:0; transform: rotate(-90deg); }
+.mini-ring svg.r circle{ fill:none; stroke-linecap:round; }
+.mini-ring .track{ stroke: var(--hairline); stroke-width:2.5; }
+.mini-ring .fill{ stroke: var(--c); stroke-width:2.5; stroke-dasharray:69.12; }
+.mini-ring .ic{ position:relative; z-index:1; color: var(--c); display:flex; }
+.mini-txt{ display:flex; flex-direction:column; line-height:1.25; }
+.mini-txt .n{ font-size:12.5px; font-weight:500; color: var(--ink); }
+.mini-txt .v{ font-size:11.5px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+.mood-dots{ display:flex; gap:4px; align-items:center; }
+.mood-dots i{
+  width:9px; height:9px; border-radius:50%;
+  background: var(--hairline);
+  display:block;
+}
+.mood-dots i.on{ background: linear-gradient(135deg, var(--m-sleep), var(--m-move)); }
+
+/* ============================================================
+   5 · Supplement slot cards
+   ============================================================ */
+.slots{ display:grid; gap:12px; }
+@media (min-width:520px){ .slots{ grid-template-columns:1fr 1fr; } }
+
+.slot{
+  border-radius: var(--r-card);
+  border:1px solid var(--hairline);
+  background: var(--surface);
+  padding:18px 18px 14px;
+  transition: border-color .3s var(--ease), background .3s var(--ease);
+}
+/* time-aware emphasis: the live slot lifts to the top and takes an accent border */
+body:has(#tod-day:checked)   .slot-afternoon,
+body:has(#tod-night:checked) .slot-night{
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--hairline));
+  background: linear-gradient(180deg, rgba(229,164,124,.055), transparent 60%), var(--surface);
+  box-shadow: 0 0 0 3px rgba(229,164,124,.05);
+  order:-1;
+}
+.slots{ display:flex; flex-direction:column; }
+@media (min-width:520px){ .slots{ display:grid; } }
+
+.slot-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--hairline);
+}
+.slot-title{ display:flex; align-items:center; gap:9px; }
+.slot-title .nm{ font-size:14px; font-weight:600; color: var(--ink); }
+.slot-title .tm{ font-size:12px; color: var(--ink-mute); font-variant-numeric: tabular-nums; letter-spacing:.02em; }
+.slot-count{
+  font-size:12.5px; font-weight:600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mute);
+  padding:3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface-sunk);
+}
+.slot-count.full{ color:#2A2521; background: var(--m-supp); }
+.now-tag{
+  display:none;
+  font-size:10px; text-transform:uppercase; letter-spacing:.08em; font-weight:600;
+  color: var(--accent);
+  padding:3px 8px; border-radius: var(--r-pill);
+  background: var(--accent-soft);
+}
+body:has(#tod-day:checked)   .slot-afternoon .now-tag,
+body:has(#tod-night:checked) .slot-night .now-tag{ display:inline-block; }
+
+.dose{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid rgba(50,44,37,.55);
+}
+.dose:last-child{ border-bottom:0; padding-bottom:4px; }
+.box{
+  width:21px; height:21px; flex-shrink:0;
+  border-radius:7px;
+  border:1.5px solid var(--hairline);
+  display:grid; place-items:center;
+  color:transparent;
+  transition: all .2s var(--ease);
+}
+.dose.taken .box{
+  background: var(--m-supp);
+  border-color: var(--m-supp);
+  color:#1a1512;
+  box-shadow: 0 0 10px rgba(214,149,155,.30);
+}
+.dose .nm{ font-size:14px; color: var(--ink); font-weight:500; }
+.dose.taken .nm{ color: var(--ink-soft); }
+.dose .ds{ font-size:12px; color: var(--ink-mute); margin-left:auto; text-align:right;
+  font-variant-numeric: tabular-nums; }
+
+.flex-chips{
+  margin-top:12px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.chip{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 13px;
+  border-radius: var(--r-pill);
+  border:1px solid var(--hairline);
+  background: var(--surface-sunk);
+  font-size:12.5px;
+  color: var(--ink-soft);
+  cursor:pointer;
+}
+.chip i{ width:6px; height:6px; border-radius:50%; background: var(--ink-mute); display:block; }
+.chip.on i{ background: var(--m-supp); box-shadow:0 0 7px rgba(214,149,155,.6); }
+.chip.on{ color: var(--ink); }
+.flex-note{ font-size:11.5px; color: var(--ink-mute); margin-top:9px; }
+
+/* ============================================================
+   6 · This week strip
+   ============================================================ */
+.week{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  padding:16px 6px 4px;
+  border-radius: var(--r-card);
+  border:1px solid var(--hairline);
+  background: var(--surface);
+}
+.day{ display:flex; flex-direction:column; align-items:center; gap:7px; flex:1; cursor:pointer; }
+.day .lb{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color: var(--ink-mute); font-weight:500; }
+.day.today .lb{ color: var(--accent); }
+.dot{ position:relative; width:26px; height:26px; }
+.dot svg{ transform: rotate(-90deg); }
+.dot circle{ fill:none; }
+.dot .tr{ stroke: var(--hairline); stroke-width:3; }
+.dot .fl{ stroke: var(--accent); stroke-width:3; stroke-linecap:round; stroke-dasharray:62.83; }
+.day.today .dot::after{
+  content:""; position:absolute; inset:-4px;
+  border-radius:50%; border:1px solid rgba(229,164,124,.55);
+}
+.day .num{ font-size:10.5px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   7 · Pursuits row
+   ============================================================ */
+.pursuits{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.pcard{
+  border-radius: var(--r-tile);
+  border:1px solid var(--hairline);
+  background: var(--surface);
+  padding:16px;
+  cursor:pointer;
+}
+.pcard .eyebrow{ margin-bottom:9px; display:flex; align-items:center; gap:6px; }
+.pcard .t{ font-family: var(--serif); font-size:15.5px; line-height:1.3; color: var(--ink); font-weight:400; }
+.pcard .a{ font-size:11.5px; color: var(--ink-mute); margin-top:3px; }
+.pbar{ height:3px; border-radius: var(--r-pill); background: var(--surface-sunk); margin:12px 0 7px; overflow:hidden; }
+.pbar span{ display:block; height:100%; border-radius: var(--r-pill); }
+.pmeta{ font-size:11.5px; color: var(--ink-mute); font-variant-numeric: tabular-nums;
+  display:flex; justify-content:space-between; }
+
+/* ============================================================
+   8 · "How was today?" — only after 4 PM
+   ============================================================ */
+.mood{ display:none; }
+body:has(#tod-dusk:checked) .mood,
+body:has(#tod-night:checked) .mood{ display:block; }
+.mood-card{
+  border-radius: var(--r-card);
+  border:1px solid var(--hairline);
+  background: var(--surface);
+  padding:20px 20px 18px;
+}
+.mood-card h3{
+  font-family: var(--serif); font-weight:400;
+  font-size:19px; line-height:1.35; margin:0 0 16px;
+}
+.scale-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.scale-row + .scale-row{ margin-top:14px; }
+.scale-row .k{ font-size:13px; color: var(--ink-soft); width:56px; }
+.scale{ display:flex; gap:9px; }
+.scale i{
+  width:26px; height:26px; border-radius:50%;
+  border:1px solid var(--hairline);
+  background: var(--surface-sunk);
+  display:block; cursor:pointer;
+}
+.scale i.sel{ border-color:transparent; background: linear-gradient(135deg, var(--m-sleep), var(--m-move));
+  box-shadow:0 0 12px rgba(229,164,124,.25); }
+
+/* ============================================================
+   FAB + bottom tab bar
+   ============================================================ */
+.fab{
+  position:absolute; right:18px; bottom:80px; z-index:12;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 20px;
+  border-radius: var(--r-pill);
+  border:0;
+  background: var(--accent);
+  color:#211a14;
+  font-family: var(--sans);
+  font-size:14px; font-weight:600;
+  cursor:pointer;
+  box-shadow: 0 8px 26px rgba(229,164,124,.30), 0 2px 6px rgba(0,0,0,.4);
+}
+
+.tabbar{
+  position:absolute; left:0; right:0; bottom:0; z-index:14;
+  height:64px;
+  display:grid; grid-template-columns: repeat(5, 1fr);
+  align-items:center;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(22,19,15,.86);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+          backdrop-filter: blur(20px) saturate(1.2);
+  border-top:1px solid var(--hairline);
+}
+.tab{
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  color: var(--ink-mute);
+  font-size:10px; font-weight:500; letter-spacing:.01em;
+  cursor:pointer;
+  transition: color .18s var(--ease);
+}
+.tab:hover{ color: var(--ink-soft); }
+.tab.active{ color: var(--accent); }
+.tab.active svg{ filter: drop-shadow(0 0 7px rgba(229,164,124,.4)); }
+
+/* gradient fade so content dissolves under the bar rather than colliding with it */
+.fadeout{
+  position:absolute; left:0; right:0; bottom:64px; height:52px; z-index:10;
+  pointer-events:none;
+  background: linear-gradient(180deg, transparent, var(--canvas));
+}
+
+.caption{
+  max-width:430px;
+  text-align:center;
+  font-size:11.5px;
+  line-height:1.6;
+  color: var(--ink-mute);
+}
+.caption b{ color: var(--ink-soft); font-weight:500; }
+
+@media (max-width:480px){
+  body{ padding:14px 10px 24px; }
+  .phone{ border-radius:26px; height: calc(100vh - 120px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration:.001ms !important; animation-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- time-of-day state (mockup-only) -->
+<input class="tod-inputs" type="radio" name="tod" id="tod-dawn">
+<input class="tod-inputs" type="radio" name="tod" id="tod-day" checked>
+<input class="tod-inputs" type="radio" name="tod" id="tod-dusk">
+<input class="tod-inputs" type="radio" name="tod" id="tod-night">
+
+<div class="tod">
+  <span class="eyebrow tod-label">Time of day</span>
+  <div class="tod-pills">
+    <label for="tod-dawn">Dawn</label>
+    <label for="tod-day">Day</label>
+    <label for="tod-dusk">Dusk</label>
+    <label for="tod-night">Night</label>
+  </div>
+</div>
+
+<div class="phone">
+<div class="scroll">
+
+  <!-- ═══ 1 · AMBIENT HEADER ═══════════════════════════════ -->
+  <header class="ambient">
+    <div class="header-row">
+      <div>
+        <h1 class="greeting">
+          <span class="g g-morning">Good morning, Tiffany</span>
+          <span class="g g-afternoon">Good afternoon, Tiffany</span>
+          <span class="g g-evening">Good evening, Tiffany</span>
+        </h1>
+        <div class="datum">Wednesday, August 12</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+        <span class="gear" title="Settings">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        <span class="streak">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#E5A47C"><path d="M12 2s5.5 4.3 5.5 9.2c0 1.5-.5 2.6-1.3 3.4.2-.7.2-1.6-.2-2.4-.5-1.1-1.6-1.9-1.6-1.9s.1 1.6-.9 2.9c-.6.8-1.6 1.3-1.6 2.6 0 .9.5 1.6 1.1 2-2.6-.3-5-2.5-5-5.6C8 8.9 12 6.6 12 2z"/><path d="M12 22c3.6 0 6.5-2.6 6.5-6 0-1-.2-1.9-.6-2.8-.3 3-2.4 4.6-4.3 5-1.3.3-2.2-.4-2.2-1.4 0-.8.5-1.3 1-1.9-2.6.5-4.9 2.4-4.9 5.1 0 .3 0 .6.1.9C8.6 21.5 10.2 22 12 22z" opacity=".55"/></svg>
+          <span><b>12</b> day streak</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+
+    <!-- ═══ 2 · QUOTE OF THE DAY ════════════════════════════ -->
+    <section aria-label="Quote of the day">
+      <article class="quote-card">
+        <div class="quote-theme">
+          <span class="theme-dot"></span>
+          <span class="eyebrow">Security</span>
+        </div>
+        <p class="quote-body">Let everything happen to you: beauty and terror. Just keep going. No feeling is final.</p>
+        <div class="quote-foot">
+          <span class="attrib">Rainer Maria Rilke</span>
+          <div class="ghost-btns">
+            <button class="ghost" title="Favorite">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21.2l7.7-7.7 1.1-1a5.5 5.5 0 0 0 0-7.9z"/></svg>
+            </button>
+            <button class="ghost" title="Add a reflection">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="M15 5l4 4"/></svg>
+            </button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- ═══ 3 · RING GRID ═══════════════════════════════════ -->
+    <section aria-label="Today's habits">
+      <div class="eyebrow" style="margin-bottom:12px">Today</div>
+      <div class="grid-8">
+
+        <!-- Meditation · done · 12 min -->
+        <div class="tile is-done" style="--c:var(--m-mind)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="0"/></svg>
+            <span class="ring-icon">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.3"/><path d="M12 9.5c-2.4 1.7-4 3.6-4 6 0 1.6 1.8 2.8 4 2.8s4-1.2 4-2.8c0-2.4-1.6-4.3-4-6z"/><path d="M4.5 15.5c1.2 2.6 4 4.3 7.5 4.3s6.3-1.7 7.5-4.3"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Meditation</span>
+          <span class="tile-val">12 min · Basics 3</span>
+        </div>
+
+        <!-- Sleep · 7.5 h · in band -->
+        <div class="tile is-done" style="--c:var(--m-sleep)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="0"/></svg>
+            <span class="ring-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.7 6.7 0 0 0 10.7 10.7z"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Sleep</span>
+          <span class="tile-val">7.5 h · in band</span>
+        </div>
+
+        <!-- Workout · done -->
+        <div class="tile is-done" style="--c:var(--m-move)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="0"/></svg>
+            <span class="ring-icon">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Workout</span>
+          <span class="tile-val">45 min · Solid Core</span>
+        </div>
+
+        <!-- Walk · done -->
+        <div class="tile is-done" style="--c:var(--m-walk)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="0"/></svg>
+            <span class="ring-icon">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.3" r="1.9"/><path d="M11 9.5 8.6 13l2.6 2.2.9 5.3"/><path d="m11 9.5 3.4 1.2 1.5 3.1"/><path d="M8.6 13 6 12l-.9 3"/><path d="m12.1 20.5-.9-5.3"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Walk</span>
+          <span class="tile-val">32 min · 4,180 steps</span>
+        </div>
+
+        <!-- Protein · 86 / 120 g → 72% -->
+        <div class="tile" style="--c:var(--m-fuel)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="43.1"/></svg>
+            <span class="ring-icon">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M2 20h20"/><path d="M8 8.2c0-1.4 1.3-1.6 1.3-3S8 3.5 8 3.5"/><path d="M13 8.2c0-1.4 1.3-1.6 1.3-3S13 3.5 13 3.5"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Protein</span>
+          <span class="tile-val">86 of 120 g</span>
+        </div>
+
+        <!-- Water · 64 / 80 oz → 80% -->
+        <div class="tile" style="--c:var(--m-water)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="30.8"/></svg>
+            <span class="ring-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6.5 6.6 6.5 11.1a6.5 6.5 0 0 1-13 0C5.5 9.3 12 2.7 12 2.7z"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Water</span>
+          <span class="tile-val">64 of 80 oz</span>
+        </div>
+
+        <!-- Supplements · 3 / 5 → 60% -->
+        <div class="tile" style="--c:var(--m-supp)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="61.6"/></svg>
+            <span class="ring-icon">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.9" y="8.6" width="20.2" height="6.8" rx="3.4" transform="rotate(-45 12 12)"/><path d="M9.2 6.9l7.9 7.9"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Supplements</span>
+          <span class="tile-val">3 of 5 doses</span>
+        </div>
+
+        <!-- Reading · done -->
+        <div class="tile is-done" style="--c:var(--m-read)">
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 56 56"><circle class="track" cx="28" cy="28" r="24.5"/><circle class="fill" cx="28" cy="28" r="24.5" stroke-dashoffset="0"/></svg>
+            <span class="ring-icon">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.8C10.4 5.5 8.3 4.8 5.6 4.8H3v13h2.6c2.7 0 4.8.7 6.4 2 1.6-1.3 3.7-2 6.4-2H21v-13h-2.6c-2.7 0-4.8.7-6.4 2z"/><path d="M12 6.8v13"/></svg>
+            </span>
+          </div>
+          <span class="tile-name">Reading</span>
+          <span class="tile-val">24 min · 18 pages</span>
+        </div>
+
+      </div>
+
+      <!-- 4 · progress bar -->
+      <div class="progress-head">
+        <span class="label"><b>5</b> of 8 closed today</span>
+        <span class="hint">3 to go</span>
+      </div>
+      <div class="progress-track"><span class="progress-fill"></span></div>
+
+      <!-- tracked, but they don't gate a perfect day -->
+      <div class="aside-row">
+        <div class="mini" style="--c:var(--m-chess)">
+          <span class="mini-ring">
+            <svg class="r" viewBox="0 0 28 28"><circle class="track" cx="14" cy="14" r="11"/><circle class="fill" cx="14" cy="14" r="11" stroke-dashoffset="69.12"/></svg>
+            <span class="ic">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.8"/><path d="M9 9.5h6l-1.2 3.2h-3.6z"/><path d="M10.2 12.7c-.4 2.6-1.4 4.3-2.7 5.6h9c-1.3-1.3-2.3-3-2.7-5.6"/><path d="M6 21h12"/><path d="M6.5 18.3h11V21h-11z"/></svg>
+            </span>
+          </span>
+          <span class="mini-txt"><span class="n">Chess</span><span class="v">— of 15 min</span></span>
+        </div>
+        <div class="mini" style="--c:var(--m-mood)">
+          <span class="mini-ring" style="width:auto">
+            <span class="mood-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>
+          </span>
+          <span class="mini-txt"><span class="n">Mood 4 · Energy 3</span><span class="v">no target — just a reading</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 5 · SUPPLEMENT SLOTS ════════════════════════════ -->
+    <section aria-label="Supplements">
+      <div class="eyebrow" style="margin-bottom:12px">Supplements · 3 of 5 doses</div>
+      <div class="slots">
+
+        <article class="slot slot-afternoon">
+          <div class="slot-head">
+            <div class="slot-title">
+              <span class="nm">Afternoon</span>
+              <span class="tm">12:00 PM</span>
+              <span class="now-tag">Now</span>
+            </div>
+            <span class="slot-count full">3/3</span>
+          </div>
+          <div class="dose taken">
+            <span class="box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="nm">Creatine</span><span class="ds">5 g</span>
+          </div>
+          <div class="dose taken">
+            <span class="box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="nm">Krill Oil</span><span class="ds">Sports Research</span>
+          </div>
+          <div class="dose taken">
+            <span class="box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="nm">TMG</span><span class="ds">2 capsules</span>
+          </div>
+        </article>
+
+        <article class="slot slot-night">
+          <div class="slot-head">
+            <div class="slot-title">
+              <span class="nm">Night</span>
+              <span class="tm">10:00 PM</span>
+              <span class="now-tag">Now</span>
+            </div>
+            <span class="slot-count">0/2</span>
+          </div>
+          <div class="dose">
+            <span class="box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="nm">Creatine</span><span class="ds">5 g</span>
+          </div>
+          <div class="dose">
+            <span class="box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="nm">Collagen</span><span class="ds">20 mg</span>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="flex-chips">
+        <span class="chip on"><i></i> B12 Complex</span>
+        <span class="chip"><i></i> Vitamin D</span>
+      </div>
+      <p class="flex-note">Flexible — not counted in your 5.</p>
+    </section>
+
+    <!-- ═══ 6 · THIS WEEK ═══════════════════════════════════ -->
+    <section aria-label="This week">
+      <div class="eyebrow" style="margin-bottom:12px">This week</div>
+      <div class="week">
+        <div class="day"><span class="lb">Mon</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="0"/></svg></span><span class="num">8/8</span></div>
+        <div class="day"><span class="lb">Tue</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="15.7"/></svg></span><span class="num">6/8</span></div>
+        <div class="day today"><span class="lb">Wed</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="23.6"/></svg></span><span class="num">5/8</span></div>
+        <div class="day"><span class="lb">Thu</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="62.83"/></svg></span><span class="num">—</span></div>
+        <div class="day"><span class="lb">Fri</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="62.83"/></svg></span><span class="num">—</span></div>
+        <div class="day"><span class="lb">Sat</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="62.83"/></svg></span><span class="num">—</span></div>
+        <div class="day"><span class="lb">Sun</span><span class="dot"><svg width="26" height="26" viewBox="0 0 26 26"><circle class="tr" cx="13" cy="13" r="10"/><circle class="fl" cx="13" cy="13" r="10" stroke-dashoffset="62.83"/></svg></span><span class="num">—</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ 7 · PURSUITS ════════════════════════════════════ -->
+    <section aria-label="Pursuits">
+      <div class="eyebrow" style="margin-bottom:12px">Pursuits</div>
+      <div class="pursuits">
+        <article class="pcard">
+          <div class="eyebrow" style="color:var(--m-read)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.8C10.4 5.5 8.3 4.8 5.6 4.8H3v13h2.6c2.7 0 4.8.7 6.4 2 1.6-1.3 3.7-2 6.4-2H21v-13h-2.6c-2.7 0-4.8.7-6.4 2z"/></svg>
+            Reading
+          </div>
+          <div class="t">The Body Keeps the Score</div>
+          <div class="a">Bessel van der Kolk</div>
+          <div class="pbar"><span style="width:44%;background:var(--m-read)"></span></div>
+          <div class="pmeta"><span>p. 142 of 320</span><span>44%</span></div>
+        </article>
+        <article class="pcard">
+          <div class="eyebrow" style="color:var(--m-chess)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.8"/><path d="M9 9.5h6l-1.2 3.2h-3.6z"/><path d="M6 21h12"/></svg>
+            Chess
+          </div>
+          <div class="t">3 sessions this week</div>
+          <div class="a">Pins &amp; skewers · Chess.com</div>
+          <div class="pbar"><span style="width:60%;background:var(--m-chess)"></span></div>
+          <div class="pmeta"><span>45 min</span><span>1284 elo</span></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ 8 · HOW WAS TODAY? (after 4 PM only) ════════════ -->
+    <section class="mood" aria-label="How was today?">
+      <div class="mood-card">
+        <h3>How was today?</h3>
+        <div class="scale-row">
+          <span class="k">Mood</span>
+          <span class="scale"><i></i><i></i><i></i><i class="sel"></i><i></i></span>
+        </div>
+        <div class="scale-row">
+          <span class="k">Energy</span>
+          <span class="scale"><i></i><i></i><i class="sel"></i><i></i><i></i></span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /page -->
+</div><!-- /scroll -->
+
+<div class="fadeout"></div>
+
+<button class="fab">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  Check in
+</button>
+
+<!-- ═══ BOTTOM TAB BAR ════════════════════════════════════ -->
+<nav class="tabbar">
+  <span class="tab active">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M11.3 2.6a1 1 0 0 1 1.4 0l8 7.4a1 1 0 0 1 .3.7V20a1.5 1.5 0 0 1-1.5 1.5h-4.3V15h-4.4v6.5H6.5A1.5 1.5 0 0 1 5 20v-9.3a1 1 0 0 1 .3-.7z"/></svg>
+    Today
+  </span>
+  <span class="tab">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 5C6 5 4 7 4 9.6c0 2.3 1.7 4.1 4 4.4-.3 2.3-1.6 3.6-3.4 4.4L5.4 20c3.4-1.2 5.6-3.9 5.6-8.1V9.6C11 7 9.9 5 8.5 5z"/><path d="M18.5 5C16 5 14 7 14 9.6c0 2.3 1.7 4.1 4 4.4-.3 2.3-1.6 3.6-3.4 4.4l.8 1.6c3.4-1.2 5.6-3.9 5.6-8.1V9.6C21 7 19.9 5 18.5 5z"/></svg>
+    Quotes
+  </span>
+  <span class="tab">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 3v3M16 3v3M7.5 11.5l1.6 1.6 3-3.2M7.5 16.5l1.6 1.6 3-3.2M14.5 12h3M14.5 17h3"/></svg>
+    Plans
+  </span>
+  <span class="tab">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h4.5a3 3 0 0 1 3 3V20a2.5 2.5 0 0 0-2.5-2.5H4z"/><path d="M20 5.5h-4.5a3 3 0 0 0-3 3V20a2.5 2.5 0 0 1 2.5-2.5H20z"/></svg>
+    Pursuits
+  </span>
+  <span class="tab">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13M9.3 20V8M14.7 20v-6M20 20V4"/></svg>
+    Analytics
+  </span>
+</nav>
+
+</div><!-- /phone -->
+
+<p class="caption">
+  Visual direction only — no data, no interactions. <b>Today</b> view per SPEC.md §5.1, dark palette per §6.1.
+  Switch the time-of-day pills above to see the ambient header, greeting, live supplement slot, and the
+  after-4 PM mood block change.
+</p>
+
+</body>
+</html>
