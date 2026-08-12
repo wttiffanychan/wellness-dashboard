@@ -272,6 +272,10 @@ export async function setPlanItemDone(date: string, planItemId: string, done: bo
   save(K.planItemLogs, logs);
 }
 
+export async function getPlanItemLogs(since: string): Promise<PlanItemLog[]> {
+  return load<PlanItemLog[]>(K.planItemLogs, []).filter((l) => l.log_date >= since);
+}
+
 // ---------- books & reading ----------
 export async function getBooks(): Promise<Book[]> {
   return load<Book[]>(K.books, []);
