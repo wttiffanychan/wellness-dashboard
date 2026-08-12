@@ -16,6 +16,7 @@ import {
   YAxis,
 } from "recharts";
 import { CalendarDays, Flame, TrendingDown, TrendingUp } from "lucide-react";
+import type { BarShapeProps, TooltipValueType } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -130,7 +131,7 @@ function getRangeDates(range: Range): { start: Date; end: Date; prevStart: Date;
 
 function generateDateRange(start: Date, end: Date): Date[] {
   const days: Date[] = [];
-  let d = new Date(start);
+  const d = new Date(start);
   while (d <= end) {
     days.push(new Date(d));
     d.setDate(d.getDate() + 1);
@@ -450,10 +451,10 @@ function Chart7d({
             <YAxis hide domain={[0, "auto"]} />
             <RechartsTooltip
               contentStyle={{ background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: 8, fontSize: 13 }}
-              formatter={(val: any) => [`${val}${meta.unit}`, meta.label]}
+              formatter={(val: TooltipValueType | undefined) => [`${val}${meta.unit}`, meta.label]}
             />
             {isSleep && target && (
-              <Bar dataKey="value" shape={(props: any) => {
+              <Bar dataKey="value" shape={(props: BarShapeProps) => {
                 const { x, y, width, height, payload } = props;
                 const isBelow = payload.hasVal && payload.value < (target ?? 0);
                 return (
@@ -462,7 +463,7 @@ function Chart7d({
               }} />
             )}
             {!isSleep && (
-              <Bar dataKey="value" shape={(props: any) => {
+              <Bar dataKey="value" shape={(props: BarShapeProps) => {
                 const { x, y, width, height, payload } = props;
                 const isBelow = payload.hasVal && target !== null && payload.value < target;
                 return (
@@ -541,7 +542,7 @@ function Chart30d({
               <YAxis hide domain={[0, "auto"]} />
               <RechartsTooltip
                 contentStyle={{ background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: 8, fontSize: 13 }}
-                formatter={(val: any, name: any) => [`${val}${meta.unit}`, name === "avg" ? "7-day avg" : meta.label]}
+                formatter={(val: TooltipValueType | undefined, name: TooltipValueType | undefined) => [`${val}${meta.unit}`, name === "avg" ? "7-day avg" : meta.label]}
               />
               <Line type="monotone" dataKey="raw" stroke={meta.color} strokeWidth={1} dot={{ r: 2, fill: meta.color, opacity: 0.3 }} opacity={0.3} connectNulls />
               <Line type="monotone" dataKey="avg" stroke={meta.color} strokeWidth={2.5} dot={false} connectNulls />
@@ -631,7 +632,7 @@ function Chart6mo({
               <YAxis hide domain={[0, "auto"]} />
               <RechartsTooltip
                 contentStyle={{ background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: 8, fontSize: 13 }}
-                formatter={(val: any) => [`${formatNum(val)}${meta.unit}`, "Weekly avg"]}
+                formatter={(val: TooltipValueType | undefined) => [`${formatNum(Number(val ?? 0))}${meta.unit}`, "Weekly avg"]}
               />
               <Area type="monotone" dataKey="value" stroke={meta.color} strokeWidth={2} fill={`url(#grad-${metricKey})`} dot={false} />
             </AreaChart>
@@ -1006,7 +1007,11 @@ function GentleInsights({
 // MAIN PAGE
 // ============================================================
 export default function AnalyticsPage() {
-  const [range, setRange] = useState<Range>("30d");
+  const [range, setRange] = useState<Range>(() => {
+    if (typeof window === "undefined") return "30d";
+    const saved = localStorage.getItem(RANGE_KEY);
+    return saved === "7d" || saved === "30d" || saved === "6mo" ? saved : "30d";
+  });
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [supplements, setSupplements] = useState<Supplement[]>([]);
@@ -1015,11 +1020,6 @@ export default function AnalyticsPage() {
   const [chessSessions, setChessSessions] = useState<ChessSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailMetric, setDetailMetric] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(RANGE_KEY);
-    if (saved && (saved === "7d" || saved === "30d" || saved === "6mo")) setRange(saved);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem(RANGE_KEY, range);

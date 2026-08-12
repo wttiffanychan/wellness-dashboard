@@ -2,8 +2,8 @@
 
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Check, Circle } from "lucide-react";
-import { getPlanItemLogs, getPlanItems, getPlans, setPlanItemDone, upsertEntry } from "@/lib/data";
-import type { Plan, PlanItem, PlanItemLog } from "@/lib/types";
+import { getEntry, getPlanItemLogs, getPlanItems, getPlans, setPlanItemDone, upsertEntry } from "@/lib/data";
+import type { DailyEntry, Plan, PlanItem, PlanItemLog } from "@/lib/types";
 
 // SPEC §5.4 — Daily Ritual timeline + Weekly Rhythm grid.
 // Items with linked_metric sync with Today's rings via upsertEntry.
@@ -15,6 +15,32 @@ const BANDS: { key: "morning" | "midday" | "evening"; label: string }[] = [
 ];
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function emptyEntry(date: string): DailyEntry {
+  return {
+    entry_date: date,
+    mood: null,
+    energy: null,
+    weight_lb: null,
+    meditation_done: false,
+    meditation_minutes: null,
+    meditation_session: null,
+    sleep_hours: null,
+    sleep_quality: null,
+    bedtime: null,
+    wake_time: null,
+    workout_done: false,
+    workout_type: null,
+    workout_minutes: null,
+    workout_intensity: null,
+    walk_done: false,
+    walk_minutes: null,
+    walk_steps: null,
+    protein_g: null,
+    water_oz: null,
+    day_note: null,
+  };
+}
 
 function dateOfWeek(dateStr: string, dow: number): string {
   // date of the current week's day (1=Mon..7=Sun)
@@ -76,7 +102,8 @@ export default function PlansPage() {
     setLogs((prev) => ({ ...prev, [key]: next }));
     await setPlanItemDone(today, item.id, next);
     if (next && item.linked_metric) {
-      const entry: any = { entry_date: today };
+      const existing = (await getEntry(today)) ?? emptyEntry(today);
+      const entry: DailyEntry = { ...existing };
       if (item.linked_metric === "walk_done") entry.walk_done = true;
       else if (item.linked_metric === "workout_done") entry.workout_done = true;
       else if (item.linked_metric === "meditation_minutes") entry.meditation_done = true;
@@ -184,7 +211,7 @@ export default function PlansPage() {
                       <span className="text-sm">{item.label}</span>
                       <span className="tabular ml-auto text-xs text-ink-mute">{doneCount} of {target}</span>
                     </div>
-                    {keys.map(({ dow, active, key }) =>
+                    {keys.map(({ active, key }) =>
                       active ? (
                         <button
                           key={key}

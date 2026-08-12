@@ -69,14 +69,15 @@ export default function SettingsPage() {
     URL.revokeObjectURL(url);
 
     // CSV per table
-    for (const [name, rows] of Object.entries({
-      daily_entries: entries,
-      chess_sessions: chess,
-      reading_sessions: reading,
-    })) {
+    const tables: Record<string, Record<string, unknown>[]> = {
+      daily_entries: entries as unknown as Record<string, unknown>[],
+      chess_sessions: chess as unknown as Record<string, unknown>[],
+      reading_sessions: reading as unknown as Record<string, unknown>[],
+    };
+    for (const [name, rows] of Object.entries(tables)) {
       if (rows.length === 0) continue;
       const headers = Object.keys(rows[0]);
-      const csv = [headers.join(","), ...rows.map((r: any) => headers.map((h) => JSON.stringify(r[h] ?? "")).join(","))].join("\n");
+      const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => JSON.stringify(r[h] ?? "")).join(","))].join("\n");
       const cblob = new Blob([csv], { type: "text/csv" });
       const curl = URL.createObjectURL(cblob);
       const ca = document.createElement("a");
@@ -147,14 +148,14 @@ export default function SettingsPage() {
                 <span className="text-sm">{f.label}</span>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => patch({ [f.key]: Math.max((settings[f.key] as number) - f.step, 0) } as any)}
+                    onClick={() => patch({ [f.key]: Math.max((settings[f.key] as number) - f.step, 0) } as Partial<Settings>)}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline text-ink-soft hover:border-accent"
                   >
                     −
                   </button>
                   <span className="tabular w-16 text-right text-sm">{settings[f.key]}{f.unit}</span>
                   <button
-                    onClick={() => patch({ [f.key]: (settings[f.key] as number) + f.step } as any)}
+                    onClick={() => patch({ [f.key]: (settings[f.key] as number) + f.step } as Partial<Settings>)}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline text-ink-soft hover:border-accent"
                   >
                     +
