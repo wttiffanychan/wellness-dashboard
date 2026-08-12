@@ -5,126 +5,165 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
+  --font-heading: var(--font-fraunces);
+  --font-display: var(--font-fraunces);
+
+  /* --- shadcn mapping onto the SPEC §6.1 warm palette --- */
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--accent);
+  --color-primary-foreground: #FFFDF9;
+  --color-secondary: var(--surface-sunk);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--surface-sunk);
+  --color-muted-foreground: var(--ink-soft);
   --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-accent-foreground: #FFFDF9;
+  --color-destructive: #C4574F;
+  --color-border: var(--hairline);
+  --color-input: var(--hairline);
+  --color-ring: var(--accent);
+  --color-success: var(--success);
+
+  /* --- metric colours (SPEC §6.1) --- */
+  --color-m-mind: var(--m-mind);
+  --color-m-sleep: var(--m-sleep);
+  --color-m-move: var(--m-move);
+  --color-m-walk: var(--m-walk);
+  --color-m-fuel: var(--m-fuel);
+  --color-m-water: var(--m-water);
+  --color-m-supp: var(--m-supp);
+  --color-m-read: var(--m-read);
+  --color-m-chess: var(--m-chess);
+
+  /* --- radius (SPEC §6.3) --- */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 32px;
+  --radius-3xl: 40px;
+  --radius-4xl: 999px;
+
+  /* --- shadows (SPEC §6.3, warm-tinted) --- */
+  --shadow-sm: 0 1px 2px rgba(66,48,34,.04), 0 2px 6px rgba(66,48,34,.04);
+  --shadow-md: 0 2px 4px rgba(66,48,34,.04), 0 8px 20px rgba(66,48,34,.06);
+  --shadow-lg: 0 4px 8px rgba(66,48,34,.05), 0 20px 48px rgba(66,48,34,.10);
+
+  /* --- spacing scale guardrails (SPEC §6.3) --- */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ============ SPEC §6.1 — Light (default) ============ */
+  --canvas: #FBF7F2;       /* warm ivory page background */
+  --surface: #FFFFFF;      /* cards */
+  --surface-sunk: #F4EEE6; /* wells, inactive tracks */
+  --hairline: #EAE1D6;     /* 1px borders, empty rings */
+  --ink: #2A2521;          /* primary text — warm near-black */
+  --ink-soft: #6B6259;     /* secondary */
+  --ink-mute: #9C9188;     /* captions, disabled */
+  --accent: #D98E63;       /* apricot — primary action, streak flame */
+  --accent-soft: #F6E3D5;  /* accent wash */
+  --success: #7E9B74;      /* sage — completion */
+
+  /* Metric colours — fixed, reused identically everywhere */
+  --m-mind: #9B8FC7;       /* meditation — lavender */
+  --m-sleep: #6E86B8;      /* sleep — indigo */
+  --m-move: #D98E63;       /* workout — apricot */
+  --m-walk: #7E9B74;       /* walking — sage */
+  --m-fuel: #C9A24C;       /* protein — amber */
+  --m-water: #6FA3B5;      /* water — sky */
+  --m-supp: #C47F86;       /* supplements — rose */
+  --m-read: #6BA396;       /* reading — teal */
+  --m-chess: #9E7FA8;      /* chess — plum */
+
+  --radius: 20px;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* ============ SPEC §6.1 — Dark ============ */
+  --canvas: #16130F;
+  --surface: #1F1B16;
+  --surface-sunk: #14110D;
+  --hairline: #322C25;
+  --ink: #F2EBE2;
+  --ink-soft: #B5AAA0;
+  --ink-mute: #837A71;
+  --accent: #E5A47C;
+  --accent-soft: #3A2C21;
+  --success: #93AE88;
+
+  --m-mind: #B0A5D6;
+  --m-sleep: #8A9FCC;
+  --m-move: #E5A47C;
+  --m-walk: #93AE88;
+  --m-fuel: #DCB863;
+  --m-water: #87B8C9;
+  --m-supp: #D6959B;
+  --m-read: #84B8AB;
+  --m-chess: #B394BC;
+
+  /* dark mode: shadows near-nothing, separate with hairline borders */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.2);
+  --shadow-md: 0 2px 6px rgba(0,0,0,.25);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,.3);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply font-sans;
+    font-feature-settings: "cv11", "ss01";
+  }
   body {
     @apply bg-background text-foreground;
   }
-  html {
-    @apply font-sans;
+  /* SPEC §6.2 — all data numerals are tabular */
+  .tabular,
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+  /* SPEC §6.2 — display serif settings for headings + quotes */
+  .font-display {
+    font-variation-settings: "SOFT" 40, "WONK" 1;
+  }
+  /* SPEC §6.3 — subtle paper grain over everything */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* SPEC §6.4 — house motion curve */
+  :root {
+    --ease-house: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  /* SPEC §6.4 — reduced motion collapses everything to ≤120ms opacity fades */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 120ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 120ms !important;
+      transform: none !important;
+    }
   }
 }
